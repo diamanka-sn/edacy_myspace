@@ -1,12 +1,18 @@
-export interface User{
-    id?:number | string
-    firstname:string
-    lastname:string
-    login:string
-    password:string
-}
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
 
-function a(){
-    console.log("donner le nombre 1")
-    console.log("donneer le b")
+@Entity()
+export class User {
+    @PrimaryGeneratedColumn()
+    id?: number | string
+
+    @Column()
+    firstname!: string
+
+    @Column()
+    lastname!: string
+    @Column()
+    login!: string
+    @Column()
+    password!: string
+
 }

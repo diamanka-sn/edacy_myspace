@@ -1,3 +1,4 @@
+import { AppDataSource } from "../data-source";
 import { User } from "../models/user";
 import { Database } from "./database";
 export class UserService {
@@ -7,29 +8,31 @@ export class UserService {
   }
 
   async getAll(): Promise<User[]> {
-    const users: User[] = await this.db.query("SELECT * FROM users");
+    // const users: User[] = await this.db.query("SELECT * FROM users");
+    const users: User[] = await AppDataSource.manager.find(User)
     return users;
   }
 
-  async getById(id: string): Promise<User | null> {
-    const users: User[] = await this.db.query(
-      "SELECT * FROM users WHERE id=?",
-      [id]
-    );
-    if (users.length > 0) {
-      return users[0];
-    }
-    return null;
+  async getById(id: number): Promise<User> {
+    // const users: User[] = await this.db.query(
+    //   "SELECT * FROM users WHERE id=?",
+    //   [id]
+    // );
+    
+    const user: any =  await AppDataSource.manager.findOneBy(User,{id:id,firstname:"",lastname:''})
+
+    return user;
   }
 
   async create(newUser: User): Promise<User> {
     // const newUser = { ...x, id: Date.now().toString()}
-    const result = await this.db.query(
-      "INSERT INTO users(firstname, lastname, login, password) VALUES(?,?,?,?)",
-      [newUser.firstname, newUser.lastname, newUser.login, newUser.password]
-    );
-    result.id = result.lastId;
-    return newUser;
+    // const result = await this.db.query(
+    //   "INSERT INTO users(firstname, lastname, login, password) VALUES(?,?,?,?)",
+    //   [newUser.firstname, newUser.lastname, newUser.login, newUser.password]
+    // );
+    // result.id = result.lastId;
+    const result = await AppDataSource.manager.save(newUser)
+    return result;
   }
 
   async delete(id: string): Promise<any> {
@@ -54,10 +57,14 @@ export class UserService {
   }
 
   async notExist(login: string): Promise<boolean> {
-    const users: User[] = await this.db.query(
-      "SELECT * FROM users WHERE login=?",
-      [login]
-    );
-    return users.length === 0;
+    const user = await AppDataSource.manager.findOneBy(User, {
+      login: login
+    })
+    // const users: User[] = await this.db.query(
+    //   "SELECT * FROM users WHERE login=?",
+    //   [login]
+    // );
+
+    return user !== undefined ? true : false
   }
 }
